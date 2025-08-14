@@ -28,6 +28,7 @@ scaler = joblib.load(SCALER_FNAME)
 model = joblib.load(MODEL_FNAME)
 feature_cols = pd.read_csv(FEATURE_COLS_FNAME, header=None).iloc[:, 0].tolist()
 
+
 def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Ensure dataframe has all expected columns (V1..V28, Time, Amount_log or Amount) and order."""
     # If Amount present but model expects Amount_log, create it
@@ -41,6 +42,7 @@ def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
             df[c] = 0.0
     df = df[feature_cols]
     return df
+
 
 def _scale_df(df: pd.DataFrame) -> np.ndarray:
     """
@@ -71,6 +73,7 @@ def _scale_df(df: pd.DataFrame) -> np.ndarray:
     # last resort: try to transform full vector (may raise)
     return scaler.transform(df.values)
 
+
 def preprocess(data: List[Dict[str, Any]]) -> (np.ndarray, pd.DataFrame):
     """
     Input: list of dicts (each dict is one transaction)
@@ -82,6 +85,7 @@ def preprocess(data: List[Dict[str, Any]]) -> (np.ndarray, pd.DataFrame):
     X = _scale_df(df.copy())
     return X, df
 
+
 def predict_proba_single(data: Dict[str, Any]) -> float:
     X, _ = preprocess([data])
     if hasattr(model, "predict_proba"):
@@ -90,6 +94,7 @@ def predict_proba_single(data: Dict[str, Any]) -> float:
         # some models (tree booster) support predict returning probabilities differently
         prob = float(model.predict(X)[0])
     return prob
+
 
 def predict_proba_batch(data: List[Dict[str, Any]]) -> List[float]:
     X, _ = preprocess(data)

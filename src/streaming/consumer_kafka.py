@@ -5,7 +5,10 @@ import argparse
 import requests
 from kafka import KafkaConsumer
 
-def kafka_consumer_loop(kafka_bootstrap, topic, api_url, batch_size=16, consumer_timeout_ms=1000):
+
+def kafka_consumer_loop(
+    kafka_bootstrap, topic, api_url, batch_size=16, consumer_timeout_ms=1000
+):
     consumer = KafkaConsumer(
         topic,
         bootstrap_servers=kafka_bootstrap,
@@ -18,22 +21,60 @@ def kafka_consumer_loop(kafka_bootstrap, topic, api_url, batch_size=16, consumer
     buffer = []
     try:
         for msg in consumer:
-            buffer.append({"Time": float(msg.value.get("Time", 0.0)),
-                           "Amount": float(msg.value.get("Amount", 0.0)),
-                           **{f"V{i}": float(msg.value.get(f"V{i}", 0.0)) for i in range(1,29)}})
+            buffer.append(
+                {
+                    "Time": float(msg.value.get("Time", 0.0)),
+                    "Amount": float(msg.value.get("Amount", 0.0)),
+                    **{
+                        f"V{i}": float(msg.value.get(f"V{i}", 0.0))
+                        for i in range(1, 29)
+                    },
+                }
+            )
             if len(buffer) >= batch_size:
-                resp = requests.post(f"{api_url}/predict_batch", json={"transactions": [{"Time": b["Time"], "Amount": b["Amount"], **{k: b[k] for k in b if k.startswith('V')}} for b in buffer]}, timeout=30)
-                print(f"[consumer] posted batch size={len(buffer)} status={resp.status_code}")
+                resp = requests.post(
+                    f"{api_url}/predict_batch",
+                    json={
+                        "transactions": [
+                            {
+                                "Time": b["Time"],
+                                "Amount": b["Amount"],
+                                **{k: b[k] for k in b if k.startswith("V")},
+                            }
+                            for b in buffer
+                        ]
+                    },
+                    timeout=30,
+                )
+                print(
+                    f"[consumer] posted batch size={len(buffer)} status={resp.status_code}"
+                )
                 buffer = []
         # flush remaining
         if buffer:
-            resp = requests.post(f"{api_url}/predict_batch", json={"transactions": [{"Time": b["Time"], "Amount": b["Amount"], **{k: b[k] for k in b if k.startswith('V')}} for b in buffer]}, timeout=30)
-            print(f"[consumer] posted final batch size={len(buffer)} status={resp.status_code}")
+            resp = requests.post(
+                f"{api_url}/predict_batch",
+                json={
+                    "transactions": [
+                        {
+                            "Time": b["Time"],
+                            "Amount": b["Amount"],
+                            **{k: b[k] for k in b if k.startswith("V")},
+                        }
+                        for b in buffer
+                    ]
+                },
+                timeout=30,
+            )
+            print(
+                f"[consumer] posted final batch size={len(buffer)} status={resp.status_code}"
+            )
     except KeyboardInterrupt:
         print("[consumer] Interrupted by user")
     finally:
         consumer.close()
         print("[consumer] Finished")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

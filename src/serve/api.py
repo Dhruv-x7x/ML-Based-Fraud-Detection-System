@@ -16,10 +16,13 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PRED_DB = os.environ.get("PRED_DB", os.path.join(BASE_DIR, "predictions.db"))
 
 # Prometheus metrics
-PRED_COUNTER = Counter("fd_predictions_total", "Total number of predictions", ["outcome"])
+PRED_COUNTER = Counter(
+    "fd_predictions_total", "Total number of predictions", ["outcome"]
+)
 LATENCY_HIST = Histogram("fd_inference_latency_seconds", "Inference latency seconds")
 
 app = FastAPI(title="Fraud Detection API", version="2.0")
+
 
 # DB init
 def init_db():
@@ -40,7 +43,9 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 init_db()
+
 
 # Pydantic models
 class Transaction(BaseModel):
@@ -76,8 +81,10 @@ class Transaction(BaseModel):
     V27: float
     V28: float
 
+
 class BatchRequest(BaseModel):
     transactions: List[Transaction]
+
 
 # Endpoints
 @app.post("/predict")
@@ -135,7 +142,10 @@ def predict_batch(req: BatchRequest):
     conn.commit()
     conn.close()
 
-    return {"results": [{"pred": int(p), "prob": float(pr)} for p, pr in zip(preds, probs)], "latency": latency}
+    return {
+        "results": [{"pred": int(p), "prob": float(pr)} for p, pr in zip(preds, probs)],
+        "latency": latency,
+    }
 
 
 @app.get("/recent")
@@ -143,12 +153,21 @@ def recent(limit: int = 100):
     conn = sqlite3.connect(PRED_DB)
     c = conn.cursor()
     rows = c.execute(
-        "SELECT ts, input_json, pred, prob, latency FROM predictions ORDER BY id DESC LIMIT ?", (limit,)
+        "SELECT ts, input_json, pred, prob, latency FROM predictions ORDER BY id DESC LIMIT ?",
+        (limit,),
     ).fetchall()
     conn.close()
     out = []
     for r in rows:
-        out.append({"ts": r[0], "input": json.loads(r[1]), "pred": r[2], "prob": r[3], "latency": r[4]})
+        out.append(
+            {
+                "ts": r[0],
+                "input": json.loads(r[1]),
+                "pred": r[2],
+                "prob": r[3],
+                "latency": r[4],
+            }
+        )
     return {"recent": out}
 
 

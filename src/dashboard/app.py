@@ -21,7 +21,9 @@ with tabs[0]:
     )
     with st.form("txn_form"):
         col1, col2 = st.columns(2)
-        Time = col1.number_input("Time (seconds since first transaction)", min_value=0.0, value=0.0)
+        Time = col1.number_input(
+            "Time (seconds since first transaction)", min_value=0.0, value=0.0
+        )
         Amount = col2.number_input("Amount", min_value=0.0, value=0.0)
         with st.expander("Advanced: V1..V28 (collapsed)"):
             V_fields = {}
@@ -39,7 +41,9 @@ with tabs[0]:
             if r.status_code == 200:
                 j = r.json()
                 st.metric("Fraud Probability", f"{j['fraud_probability']*100:.2f}%")
-                st.metric("Prediction", "FRAUD" if j["prediction"] == 1 else "Not Fraud")
+                st.metric(
+                    "Prediction", "FRAUD" if j["prediction"] == 1 else "Not Fraud"
+                )
                 st.json(j)
             else:
                 st.error(f"API error: {r.status_code} - {r.text}")
@@ -54,8 +58,12 @@ with tabs[1]:
     )
     col1, col2 = st.columns([3, 1])
     with col2:
-        REFRESH = st.number_input("Refresh every (s)", min_value=1, max_value=10, value=3)
-        MAX_ROWS = st.number_input("Rows to show", min_value=10, max_value=500, value=100)
+        REFRESH = st.number_input(
+            "Refresh every (s)", min_value=1, max_value=10, value=3
+        )
+        MAX_ROWS = st.number_input(
+            "Rows to show", min_value=10, max_value=500, value=100
+        )
         st.write("API URL:", API_URL)
 
     holder = st.empty()
@@ -76,7 +84,9 @@ with tabs[1]:
     if "running" not in st.session_state:
         st.session_state.running = False
 
-    start_stop = col1.button("Start Live Poll" if not st.session_state.running else "Stop Live Poll")
+    start_stop = col1.button(
+        "Start Live Poll" if not st.session_state.running else "Stop Live Poll"
+    )
     if start_stop:
         st.session_state.running = not st.session_state.running
 
@@ -87,7 +97,9 @@ with tabs[1]:
             df = pd.DataFrame(
                 [
                     {
-                        "ts": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(r["ts"])),
+                        "ts": time.strftime(
+                            "%Y-%m-%d %H:%M:%S", time.localtime(r["ts"])
+                        ),
                         "pred": r["pred"],
                         "prob": r["prob"],
                     }
@@ -104,7 +116,9 @@ with tabs[1]:
             stat_cols[2].metric("Fraud rate", f"{fraud_rate:.4f}")
             chart_slot.line_chart(df["prob"].astype(float))
         else:
-            holder.write("No recent predictions yet (start consumer/producer or run local fallback).")
+            holder.write(
+                "No recent predictions yet (start consumer/producer or run local fallback)."
+            )
         time.sleep(REFRESH)
         # allow manual stop
         if not st.session_state.running:
