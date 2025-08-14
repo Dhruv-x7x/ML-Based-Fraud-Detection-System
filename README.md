@@ -14,3 +14,7 @@ Find citations in `citations.md`
 | Logistic Regression  | 0.971113  | 0.713542 |
 | LightGBM  | 0.963068  |  0.838613 | 
 | **XGboost** | **0.976652** | **0.870020** |
+
+We used XGboost for the structured data. The Precison-Recall curve is given below,
+
+<img width="803" height="701" alt="image" src="https://github.com/user-attachments/assets/5503121c-c4b5-4653-b618-f975628fc536" />
