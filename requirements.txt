@@ -7,3 +7,11 @@ numpy
 scikit-learn
 streamlit
 requests
+prometheus-client==0.16.0
+kafka-python==2.1.0
+xgboost==1.7.6
+sqlalchemy
+pytest==7.4.0
+black==24.3.0
+flake8==6.1.0
+python-dotenv==1.0.0
