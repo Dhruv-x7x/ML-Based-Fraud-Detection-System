@@ -16,13 +16,18 @@ def kafka_producer_loop(
         bootstrap_servers=kafka_bootstrap,
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
     )
-    print(f"[producer] Starting: {len(df)} rows -> topic '{topic}' at {rate} tx/s")
+    print(
+        f"[producer] Starting: {len(df)} rows -> topic '{topic}' at {rate} tx/s"
+    )
     try:
         while True:
             for _, row in df.iterrows():
                 tx = row.to_dict()
                 # ensure floats are normal python floats
-                tx = {k: (float(v) if pd.notna(v) else 0.0) for k, v in tx.items()}
+                tx = {
+                    k: (float(v) if pd.notna(v) else 0.0)
+                    for k, v in tx.items()
+                }
                 producer.send(topic, tx)
                 time.sleep(1.0 / rate)
             producer.flush()

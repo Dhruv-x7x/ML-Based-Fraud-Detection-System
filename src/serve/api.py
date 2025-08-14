@@ -7,7 +7,12 @@ from typing import List, Dict
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from starlette.responses import Response
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import (
+    Counter,
+    Histogram,
+    generate_latest,
+    CONTENT_TYPE_LATEST,
+)
 
 from .predict import predict_proba_single, predict_proba_batch
 
@@ -19,7 +24,9 @@ PRED_DB = os.environ.get("PRED_DB", os.path.join(BASE_DIR, "predictions.db"))
 PRED_COUNTER = Counter(
     "fd_predictions_total", "Total number of predictions", ["outcome"]
 )
-LATENCY_HIST = Histogram("fd_inference_latency_seconds", "Inference latency seconds")
+LATENCY_HIST = Histogram(
+    "fd_inference_latency_seconds", "Inference latency seconds"
+)
 
 app = FastAPI(title="Fraud Detection API", version="2.0")
 
@@ -106,7 +113,13 @@ def predict(txn: Transaction):
     c = conn.cursor()
     c.execute(
         "INSERT INTO predictions (ts, input_json, pred, prob, latency) VALUES (?, ?, ?, ?, ?)",
-        (time.time(), json.dumps(txn.dict()), pred, float(prob), float(latency)),
+        (
+            time.time(),
+            json.dumps(txn.dict()),
+            pred,
+            float(prob),
+            float(latency),
+        ),
     )
     conn.commit()
     conn.close()
@@ -143,7 +156,9 @@ def predict_batch(req: BatchRequest):
     conn.close()
 
     return {
-        "results": [{"pred": int(p), "prob": float(pr)} for p, pr in zip(preds, probs)],
+        "results": [
+            {"pred": int(p), "prob": float(pr)} for p, pr in zip(preds, probs)
+        ],
         "latency": latency,
     }
 

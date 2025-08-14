@@ -40,9 +40,12 @@ with tabs[0]:
             r = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
             if r.status_code == 200:
                 j = r.json()
-                st.metric("Fraud Probability", f"{j['fraud_probability']*100:.2f}%")
                 st.metric(
-                    "Prediction", "FRAUD" if j["prediction"] == 1 else "Not Fraud"
+                    "Fraud Probability", f"{j['fraud_probability']*100:.2f}%"
+                )
+                st.metric(
+                    "Prediction",
+                    "FRAUD" if j["prediction"] == 1 else "Not Fraud",
                 )
                 st.json(j)
             else:

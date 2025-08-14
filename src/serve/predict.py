@@ -22,7 +22,9 @@ if not os.path.exists(SCALER_FNAME):
 if not os.path.exists(MODEL_FNAME):
     raise FileNotFoundError(f"Model not found at {MODEL_FNAME}")
 if not os.path.exists(FEATURE_COLS_FNAME):
-    raise FileNotFoundError(f"feature_cols.csv not found at {FEATURE_COLS_FNAME}")
+    raise FileNotFoundError(
+        f"feature_cols.csv not found at {FEATURE_COLS_FNAME}"
+    )
 
 scaler = joblib.load(SCALER_FNAME)
 model = joblib.load(MODEL_FNAME)

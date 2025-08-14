@@ -17,7 +17,9 @@ def kafka_consumer_loop(
         enable_auto_commit=True,
         consumer_timeout_ms=consumer_timeout_ms,
     )
-    print(f"[consumer] Subscribed to {topic}, posting to API {api_url}/predict_batch")
+    print(
+        f"[consumer] Subscribed to {topic}, posting to API {api_url}/predict_batch"
+    )
     buffer = []
     try:
         for msg in consumer:
