@@ -6,6 +6,7 @@ import time
 import os
 
 # Default API URL used by dashboard. When running locally without Docker use http://localhost:8000
+# If ST_API_URL is not set in docker then default to localost:8000
 API_URL = os.environ.get("ST_API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
@@ -35,10 +36,10 @@ with tabs[0]:
 
     if submitted:
         payload = {"Time": float(Time), "Amount": float(Amount)}
-        payload.update({k: float(v) for k, v in V_fields.items()})
+        payload.update({k: float(v) for k, v in V_fields.items()}) # this dictionary easily encodes to json and is sent as payload
         try:
-            r = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
-            if r.status_code == 200:
+            r = requests.post(f"{API_URL}/predict", json=payload, timeout=10) # we send a request to our predict endpoint
+            if r.status_code == 200: # OK; Success
                 j = r.json()
                 st.metric(
                     "Fraud Probability", f"{j['fraud_probability']*100:.2f}%"
