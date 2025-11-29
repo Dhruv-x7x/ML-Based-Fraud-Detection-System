@@ -34,4 +34,14 @@ Find citations in `citations.md`
 | **XGBoost** | Extremely low false alarms | Misses too many actual frauds |
 
 #### Conclusion
+
 **LightGBM** appears to offer the best balance for fraud detection, catching 87.8% of frauds while keeping false alarms manageable at 40 cases.
+
+---
+
+## Dashboard - Streamlit
+<img width="2695" height="1559" alt="Screenshot from 2025-11-29 17-39-00" src="https://github.com/user-attachments/assets/bd7f075c-3370-42e0-b6a5-e2ea87684888" />
+
+## Dashboard - Prometheus
+<img width="2695" height="1559" alt="Screenshot from 2025-11-29 17-38-44" src="https://github.com/user-attachments/assets/c175ae41-db78-4e0d-8d67-068fe9f50bfd" />
+
