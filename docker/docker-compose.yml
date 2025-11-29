@@ -1,25 +1,23 @@
-version: "3.8"
 services:
   zookeeper:
-    image: bitnami/zookeeper:3.8
+    image: confluentinc/cp-zookeeper:7.5.0
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - "2181:2181"
 
   kafka:
-    image: bitnami/kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:29092,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
-      - "9094:9094"
     depends_on:
       - zookeeper
 
@@ -27,10 +25,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.api
-    volumes:
-      - ../models:/app/models:ro
-      - ../src:/app/src:ro
-      - ../data:/app/data:ro
     environment:
       - PRED_DB=/app/predictions.db
     ports:
@@ -42,10 +36,9 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.dashboard
-    volumes:
-      - ../src:/app/src:ro
     environment:
-      - ST_API_URL=http://api:8000
+      - API_URL=http://api:8000
+      - KAFKA_BOOTSTRAP=kafka:29092
     ports:
       - "8501:8501"
     depends_on:

@@ -1,11 +1,17 @@
 # docker/Dockerfile.api
 FROM python:3.11-slim
 WORKDIR /app
-COPY ../requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
-COPY ../src /app/src
-COPY ../models /app/models
-COPY ../data /app/data
-ENV PYTHONPATH=/app/src
+
+# Install system dependencies for LightGBM (libgomp)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ src/
+COPY models/ models/
+COPY data/ data/
+ENV PYTHONPATH=/app
 EXPOSE 8000
-CMD ["uvicorn", "src.serve.api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["uvicorn", "src.serve.api:app", "--host", "0.0.0.0", "--port", "8000"]

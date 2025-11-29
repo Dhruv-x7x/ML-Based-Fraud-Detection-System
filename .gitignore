@@ -2,8 +2,10 @@
 __pycache__/
 *.py[codz]
 *$py.class
-data/
-*.csv
+
+# Large data files (keep folder structure)
+data/*.csv
+*.db
 
 # C extensions
 *.so
